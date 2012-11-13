@@ -185,38 +185,6 @@ nvm()
 
       [ -d "$NVM_DIR/$VERSION" ] && echo "$VERSION is already installed." && return
 
-      # shortcut - try the binary if possible.
-      if [ -n "$os" ]; then
-        binavail=
-        # binaries started with node 0.8.6
-        case "$VERSION" in
-          v0.8.[012345]) binavail=0 ;;
-          v0.[1234567]) binavail=0 ;;
-          *) binavail=1 ;;
-        esac
-        if [ $binavail -eq 1 ]; then
-          t="$VERSION-$os-$arch"
-          url="http://nodejs.org/dist/$VERSION/node-${t}.tar.gz"
-          sum=`curl -s http://nodejs.org/dist/$VERSION/SHASUMS.txt.asc | grep node-${t}.tar.gz | awk '{print $1}'`
-          if (
-            mkdir -p "$NVM_DIR/bin/node-${t}" && \
-            cd "$NVM_DIR/bin" && \
-            curl -C - --progress-bar $url -o "node-${t}.tar.gz" && \
-            nvm_checksum `shasum node-${t}.tar.gz | awk '{print $1}'` $sum && \
-            tar -xzf "node-${t}.tar.gz" -C "node-${t}" --strip-components 1 && \
-            mv "node-${t}" "../$VERSION" && \
-            rm -f "node-${t}.tar.gz"
-            )
-          then
-            nvm use $VERSION
-            return;
-          else
-            echo "Binary download failed, trying source." >&2
-            cd "$NVM_DIR/bin" && rm -rf "node-${t}.tar.gz" "node-${t}"
-          fi
-        fi
-      fi
-
       echo "Additional options while compiling: $ADDITIONAL_PARAMETERS"
 
       tarball=''
